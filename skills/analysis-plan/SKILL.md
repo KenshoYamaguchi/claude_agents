@@ -1,14 +1,18 @@
 ---
 name: analysis-plan
-description: 分析プランのテンプレートを docs/ANALYSIS_PLAN.md に展開するスキル。analysis-plannerエージェントを使わず手動でプランを書きたいときに使う。Use when manually writing an analysis plan.
+description: 分析プランのテンプレートを docs/analysis_plan_{名前}.md に展開するスキル。analysis-plannerエージェントを使わず手動でプランを書きたいときに使う。Use when manually writing an analysis plan.
 argument-hint: [分析タイトル]
 ---
 
 # 分析プランテンプレート展開: $ARGUMENTS
 
-以下の内容で `docs/ANALYSIS_PLAN.md` を生成してください。
+ファイル名は `docs/analysis_plan_$ARGUMENTS.md` とします（スペースはアンダースコアに変換）。
 
-## 生成するファイル: `docs/ANALYSIS_PLAN.md`
+例: 引数が「売上低下分析 2024Q1」→ `docs/analysis_plan_売上低下分析_2024Q1.md`
+
+以下の内容でファイルを生成してください。
+
+## 生成するファイル: `docs/analysis_plan_$ARGUMENTS.md`
 
 ```markdown
 # 分析プラン: $ARGUMENTS

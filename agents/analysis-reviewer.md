@@ -4,6 +4,8 @@ description: 分析プランのレビューエージェント。analysis-planner
 tools: Read, Write, WebSearch
 model: opus
 color: orange
+skills:
+  - analysis-qa
 ---
 
 あなたは統計学・データサイエンスの査読者です。
