@@ -1,98 +1,126 @@
 ---
 name: new-system
-description: 新しいシステム開発を最初から始めるときのマスタースキル。要件定義→バックエンド→フロントエンド→GitHub設定→デプロイの順でエージェントを使う手順を案内する。Use when starting development of a new system from scratch.
+description: 新しいシステム開発を最初から始めるときのマスタースキル。プラン立案→レビュー→再立案→人間チェック→実装→GitHub設定→デプロイの順でエージェントを使う手順を案内する。Use when starting development of a new system from scratch.
 argument-hint: [システム名]
 ---
 
-# 新規システム開発ガイド
+# 新規システム開発ガイド: $ARGUMENTS
 
-$ARGUMENTSの開発を以下の順番で進めます。
-
-## フェーズ概要
+以下の順番で進めます。**人間によるゲートチェック（Phase 4）を必ず挟みます。**
 
 ```
-Phase 1: 要件定義      → @requirements-analyst
-Phase 2: バックエンド  → @backend-architect
-Phase 3: フロントエンド → @frontend-architect
-Phase 4: GitHub設定    → @github-manager
-Phase 5: デプロイ      → @deploy-manager
+Phase 1: システム設計プラン立案    → @system-planner
+Phase 2: エージェントレビュー      → @system-reviewer
+Phase 3: プラン再立案              → @system-planner（修正版）
+Phase 4: ★ 人間による最終チェック ★
+Phase 5: 実装                     → @system-coder
+Phase 6: GitHub設定               → @github-manager
+Phase 7: デプロイ                 → @deploy-manager
 ```
 
 ---
 
-## Phase 1: 要件定義
-
-まず `@requirements-analyst` に依頼してください:
+## Phase 1: システム設計プラン立案
 
 ```
-@requirements-analyst $ARGUMENTSの要件定義を行ってください
+@system-planner $ARGUMENTSのシステム設計プランを立案してください
 ```
 
 **完了の目安:**
-- `docs/PRD.md` が作成されている
-- `docs/TECH_STACK.md` が作成されている
-- `docs/ER_DIAGRAM.md` が作成されている
+- `docs/system_plan_$ARGUMENTS.md` が作成されている（ステータス: Draft）
+- 要件・アーキテクチャ・キャッシュ設計・DB構成・計算基盤配置が記載されている
 
 ---
 
-## Phase 2: バックエンド構成
+## Phase 2: エージェントレビュー
 
-PRD承認後、`@backend-architect` に依頼:
+プランが作成されたら **すぐに** レビューへ（人間は待機）:
 
 ```
-@backend-architect docs/PRD.md を読んでバックエンドを構成してください
+@system-reviewer docs/system_plan_*.md をレビューしてください
 ```
 
 **完了の目安:**
-- `backend/` ディレクトリが作成されている
-- `docs/API_SPEC.md` が作成されている
-- `docs/DB_SCHEMA.md` が作成されている
-- `docker-compose.yml` が作成されている
+- `docs/system_review_*.md` が作成されている
+- 総合判定が明記されている
 
 ---
 
-## Phase 3: フロントエンド構成
+## Phase 3: プラン再立案
 
-バックエンド構成後、`@frontend-architect` に依頼:
+レビューフィードバックを反映:
 
 ```
-@frontend-architect docs/API_SPEC.md を読んでフロントエンドを構成してください
+@system-planner docs/system_review_*.md を読んでプランを修正してください
 ```
 
 **完了の目安:**
-- `frontend/` ディレクトリが作成されている
-- `docs/COMPONENT_DESIGN.md` が作成されている
+- プランがバージョンアップされている（v1 → v2）
+- 必須修正事項が全て対応されている
 
 ---
 
-## Phase 4: GitHub管理設定
+## Phase 4: ★ 人間による最終チェック ★
 
-コード雛形完成後、`@github-manager` に依頼:
+**ここで必ず立ち止まって確認してください。**
+
+```markdown
+## チェックリスト
+
+### アーキテクチャ
+- [ ] キャッシュ設計が自分の用途に合っているか
+- [ ] DB構成（OLTP/OLAP/KVS）の選定に納得できるか
+- [ ] 重い処理の配置（同期/非同期/バッチ）が適切か
+- [ ] 単一障害点がないか
+
+### 要件・スコープ
+- [ ] MVPの範囲が適切か（大きすぎ/小さすぎないか）
+- [ ] 技術スタックに納得できるか
+- [ ] コスト見積もりが現実的か
+
+### セキュリティ
+- [ ] 認証・認可の設計に問題がないか
+- [ ] 機密データの扱いが適切か
+```
+
+✅ OKなら `docs/system_plan_*.md` のステータスを **"Approved"** に変更してから次へ。
+❌ 問題があれば @system-planner に追加フィードバックを伝えて再立案。
+
+---
+
+## Phase 5: 実装
+
+**Approved になってから** 依頼:
 
 ```
-@github-manager GitHubリポジトリの設定・CI/CD・テンプレートを整備してください
+@system-coder docs/system_plan_*.md に基づいて実装してください
+```
+
+**完了の目安:**
+- `backend/` `frontend/` `infra/` の雛形が生成されている
+- `docker-compose up` でローカルが起動する
+- ヘルスチェックエンドポイントが応答する
+
+---
+
+## Phase 6: GitHub設定
+
+```
+@github-manager このプロジェクトのGitHub設定を行ってください
 ```
 
 **完了の目安:**
 - `.github/workflows/ci.yml` が作成されている
-- `.github/workflows/deploy.yml` が作成されている
-- `.github/PULL_REQUEST_TEMPLATE.md` が作成されている
 - ブランチ保護ルールが設定されている
+- PRテンプレートが作成されている
 
 ---
 
-## Phase 5: デプロイ
-
-GitHub設定完了後、`@deploy-manager` に依頼:
+## Phase 7: デプロイ
 
 ```
 @deploy-manager ステージング環境へのデプロイを実施してください
 ```
-
-**完了の目安:**
-- ステージング環境が動作している
-- ヘルスチェックが通っている
-- `docs/DEPLOY_LOG.md` に記録されている
 
 ---
 
@@ -100,20 +128,18 @@ GitHub設定完了後、`@deploy-manager` に依頼:
 
 ```
 docs/
-├── PRD.md              ← 要件定義書
-├── TECH_STACK.md       ← 技術スタック
-├── ER_DIAGRAM.md       ← ER図
-├── API_SPEC.md         ← API仕様書
-├── DB_SCHEMA.md        ← DB設計
-├── COMPONENT_DESIGN.md ← コンポーネント設計
-└── DEPLOY_LOG.md       ← デプロイ履歴
+├── system_plan_*.md        ← 承認済みシステム設計プラン
+├── system_review_*.md      ← エージェントレビュー結果
+└── API_SPEC.md             ← API仕様書（system-coderが生成）
 
-backend/                ← バックエンドコード
-frontend/               ← フロントエンドコード
-docker-compose.yml      ← ローカル開発環境
+backend/                    ← バックエンドコード
+frontend/                   ← フロントエンドコード
+infra/
+├── docker-compose.yml
+└── scripts/
+
 .github/
-├── workflows/
-│   ├── ci.yml
-│   └── deploy.yml
-└── PULL_REQUEST_TEMPLATE.md
+└── workflows/
+    ├── ci.yml
+    └── deploy.yml
 ```
